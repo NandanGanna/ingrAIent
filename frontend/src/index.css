@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Custom global styles */
+:root {
+  --text: #242A25;
+  --bg: #F8F7F1;
+  --border: #E7E9E1;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  margin: 0;
+}
