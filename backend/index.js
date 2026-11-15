@@ -155,12 +155,22 @@ app.get('/api/generate', (req, res) => {
   });
 });
 
+const distPath = path.resolve(__dirname, '../frontend/dist');
+const fs = require('fs');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`===============================================`);
   console.log(`IngrAIent Backend running on port ${PORT}`);
   console.log(`Brand: IngrAIent — Turn ingredients into inspiration.`);
   console.log(`Gemini API configured: ${Boolean(process.env.GEMINI_API_KEY)}`);
-  console.log(`Gemini Model: ${process.env.GEMINI_MODEL || 'gemini-3.8-flash'}`);
+  console.log(`Gemini Model: ${process.env.GEMINI_MODEL || 'gemini-3.5-flash'}`);
   console.log(`===============================================`);
 });
