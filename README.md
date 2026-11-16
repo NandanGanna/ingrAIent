@@ -2,7 +2,23 @@
 
 > **Turn ingredients into inspiration.**
 
+🌐 **Live Demo:** [https://ingraient.onrender.com/dashboard](https://ingraient.onrender.com/dashboard)
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://ingraient.onrender.com/dashboard)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](https://opensource.org/licenses/ISC)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Gemini](https://img.shields.io/badge/Google%20Gemini-API-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
+
 **IngrAIent** is an intelligent kitchen management and recipe discovery web application that answers the central everyday question: **"What can I cook with what I already have?"**
+
+---
+
+## 🚀 Deployed Application
+
+- **Live URL**: [https://ingraient.onrender.com/dashboard](https://ingraient.onrender.com/dashboard)
+- **Status**: Active & Hosted on Render
+- **Architecture**: Unified full-stack deployment (Node.js/Express backend + React 19 Vite production build).
 
 ---
 
