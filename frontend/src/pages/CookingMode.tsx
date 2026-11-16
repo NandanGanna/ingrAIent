@@ -9,7 +9,6 @@ import {
   Clock, 
   CheckCircle2, 
   X, 
-  ChefHat, 
   Check, 
   Volume2
 } from 'lucide-react';
@@ -148,8 +147,8 @@ export default function CookingMode() {
       {/* Top Header Bar */}
       <header className="bg-[#244C3A] text-white px-6 py-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#D9E9A5] flex items-center justify-center text-[#244C3A]">
-            <ChefHat className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-[#D9E9A5] p-1 flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="/logo.png" alt="IngrAIent Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h1 className="text-base sm:text-lg font-bold leading-tight truncate max-w-xs sm:max-w-md">

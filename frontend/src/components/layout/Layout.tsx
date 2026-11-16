@@ -10,7 +10,6 @@ import {
   Menu, 
   X, 
   AlertTriangle,
-  Leaf,
   Info
 } from 'lucide-react';
 import { getPantry, getExpiryStatus, getSavedRecipes } from '../../utils/pantry';
@@ -91,11 +90,11 @@ export default function Layout({ children }: LayoutProps) {
         <div>
           {/* Brand Logo */}
           <Link to="/dashboard" className="flex items-center gap-3 mb-8 group">
-            <div className="w-10 h-10 rounded-xl bg-[#D9E9A5] flex items-center justify-center text-[#244C3A] shadow-md group-hover:scale-105 transition-transform">
-              <Leaf className="w-6 h-6 fill-[#244C3A]" />
+            <div className="w-11 h-11 rounded-2xl bg-[#D9E9A5] p-1.5 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden">
+              <img src="/logo.png" alt="IngrAIent Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <div className="text-2xl font-bold tracking-tight leading-none text-white">
+              <div className="text-2xl font-black tracking-tight leading-none text-white">
                 Ingr<span className="text-[#D9E9A5] font-extrabold">AI</span>ent
               </div>
               <span className="text-[10px] text-[#A8BDA5] uppercase tracking-wider block mt-1 font-medium">
@@ -171,8 +170,8 @@ export default function Layout({ children }: LayoutProps) {
       {/* Mobile Top Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#244C3A] text-white flex items-center justify-between px-4 z-30 shadow-md">
         <Link to="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#D9E9A5] flex items-center justify-center text-[#244C3A]">
-            <Leaf className="w-5 h-5 fill-[#244C3A]" />
+          <div className="w-9 h-9 rounded-xl bg-[#D9E9A5] p-1 flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="/logo.png" alt="IngrAIent Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-xl font-bold tracking-tight">
             Ingr<span className="text-[#D9E9A5]">AI</span>ent

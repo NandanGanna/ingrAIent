@@ -75,38 +75,44 @@ export default function About() {
       <div className="bg-gradient-to-br from-[#244C3A] to-[#1B382B] text-white p-8 md:p-12 rounded-3xl shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#D9E9A5]/10 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9E9A5]/20 text-[#D9E9A5] text-xs font-semibold tracking-wide uppercase border border-[#D9E9A5]/30">
-            <Sparkles className="w-3.5 h-3.5" />
-            Kitchen Intelligence Platform
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9E9A5]/20 text-[#D9E9A5] text-xs font-semibold tracking-wide uppercase border border-[#D9E9A5]/30">
+              <Sparkles className="w-3.5 h-3.5" />
+              Kitchen Intelligence Platform
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+              Turn Ingredients into <span className="text-[#D9E9A5]">Inspiration.</span>
+            </h1>
+
+            <p className="text-[#A8BDA5] text-base md:text-lg leading-relaxed">
+              <strong>IngrAIent</strong> answers the central everyday question: <strong>&ldquo;What can I cook with what I already have?&rdquo;</strong> By uniting intelligent pantry tracking with Google Gemini AI, IngrAIent transforms your available ingredients into delicious, waste-free home-cooked meals.
+            </p>
+
+            <div className="pt-2 flex flex-wrap gap-3">
+              <Link
+                to="/discover"
+                className="inline-flex items-center gap-2 bg-[#D9E9A5] text-[#244C3A] font-bold px-5 py-2.5 rounded-xl text-sm shadow hover:bg-[#cbe08e] transition-colors"
+              >
+                Start Cooking
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="https://github.com/NandanGanna/ingrAIent"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-colors border border-white/15"
+              >
+                <GithubIcon className="w-4 h-4" />
+                GitHub Repository
+                <ExternalLink className="w-3.5 h-3.5 text-white/60" />
+              </a>
+            </div>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
-            Turn Ingredients into <span className="text-[#D9E9A5]">Inspiration.</span>
-          </h1>
-
-          <p className="text-[#A8BDA5] text-base md:text-lg max-w-2xl leading-relaxed">
-            IngrAIent answers the central everyday question: <strong>&ldquo;What can I cook with what I already have?&rdquo;</strong> By uniting intelligent pantry tracking with Google Gemini AI, IngrAIent transforms your available ingredients into delicious, waste-free home-cooked meals.
-          </p>
-
-          <div className="pt-2 flex flex-wrap gap-3">
-            <Link
-              to="/discover"
-              className="inline-flex items-center gap-2 bg-[#D9E9A5] text-[#244C3A] font-bold px-5 py-2.5 rounded-xl text-sm shadow hover:bg-[#cbe08e] transition-colors"
-            >
-              Start Cooking
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <a
-              href="https://github.com/NandanGanna/ingrAIent"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition-colors border border-white/15"
-            >
-              <GithubIcon className="w-4 h-4" />
-              GitHub Repository
-              <ExternalLink className="w-3.5 h-3.5 text-white/60" />
-            </a>
+          <div className="w-32 h-32 md:w-44 md:h-44 shrink-0 rounded-full bg-[#D9E9A5] p-3 shadow-2xl flex items-center justify-center border-4 border-white/20">
+            <img src="/logo.png" alt="IngrAIent Official Logo" className="w-full h-full object-contain" />
           </div>
         </div>
       </div>

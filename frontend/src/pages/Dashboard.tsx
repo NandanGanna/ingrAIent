@@ -58,36 +58,42 @@ export default function Dashboard() {
     <div className="space-y-10">
       {/* Editorial Hero Banner */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#244C3A] via-[#2d5c47] to-[#1c3d2f] text-white p-8 md:p-12 shadow-xl border border-[#1e3f30]">
-        <div className="relative z-10 max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D9E9A5]/20 text-[#D9E9A5] text-xs font-semibold tracking-wide uppercase border border-[#D9E9A5]/30">
-            <Sparkles className="w-3.5 h-3.5" />
-            Zero-Waste Culinary Intelligence
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D9E9A5]/20 text-[#D9E9A5] text-xs font-semibold tracking-wide uppercase border border-[#D9E9A5]/30">
+              <Sparkles className="w-3.5 h-3.5" />
+              Zero-Waste Culinary Intelligence
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+              Let's make something <span className="text-[#D9E9A5] italic">delicious.</span>
+            </h1>
+
+            <p className="text-base md:text-lg text-[#F8F7F1]/90 leading-relaxed font-light">
+              Discover amazing chef-quality meals crafted from the ingredients already in your kitchen. Save money, eliminate food waste, and cook with confidence.
+            </p>
+
+            <div className="pt-4 flex flex-wrap gap-4 items-center">
+              <Link
+                to="/discover"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#D9E9A5] text-[#244C3A] font-bold text-base hover:bg-[#cbe090] transition-all shadow-md hover:shadow-lg active:scale-95"
+              >
+                <Sparkles className="w-5 h-5 text-[#244C3A]" />
+                Find Recipes
+              </Link>
+
+              <Link
+                to="/pantry"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-base transition-all border border-white/20 active:scale-95"
+              >
+                <ShoppingBag className="w-5 h-5 text-[#A8BDA5]" />
+                Manage Pantry ({pantry.length})
+              </Link>
+            </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            Let's make something <span className="text-[#D9E9A5] italic">delicious.</span>
-          </h1>
-
-          <p className="text-base md:text-lg text-[#F8F7F1]/90 leading-relaxed font-light">
-            Discover amazing chef-quality meals crafted from the ingredients already in your kitchen. Save money, eliminate food waste, and cook with confidence.
-          </p>
-
-          <div className="pt-4 flex flex-wrap gap-4 items-center">
-            <Link
-              to="/discover"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#D9E9A5] text-[#244C3A] font-bold text-base hover:bg-[#cbe090] transition-all shadow-md hover:shadow-lg active:scale-95"
-            >
-              <Sparkles className="w-5 h-5 text-[#244C3A]" />
-              Find Recipes
-            </Link>
-
-            <Link
-              to="/pantry"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-base transition-all border border-white/20 active:scale-95"
-            >
-              <ShoppingBag className="w-5 h-5 text-[#A8BDA5]" />
-              Manage Pantry ({pantry.length})
-            </Link>
+          <div className="hidden lg:flex w-36 h-36 shrink-0 rounded-3xl bg-[#D9E9A5]/20 p-3 backdrop-blur-sm border border-[#D9E9A5]/30 items-center justify-center shadow-xl">
+            <img src="/logo.png" alt="IngrAIent Official Logo" className="w-full h-full object-contain" />
           </div>
         </div>
 
