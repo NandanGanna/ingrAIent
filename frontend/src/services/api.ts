@@ -4,7 +4,7 @@ import type { Recipe, GenerateRecipeRequest } from '../types';
 const rawApiUrl = import.meta.env.VITE_API_URL;
 const API_BASE_URL = rawApiUrl 
   ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl.replace(/\/+$/, '')}/api`)
-  : 'http://localhost:4000/api';
+  : (import.meta.env.DEV ? 'http://localhost:4000/api' : '/api');
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
