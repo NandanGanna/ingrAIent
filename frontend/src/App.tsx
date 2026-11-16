@@ -7,6 +7,7 @@ import SavedRecipes from "./pages/SavedRecipes";
 import RecipeDetails from "./pages/RecipeDetails";
 import CookingMode from "./pages/CookingMode";
 import Insights from "./pages/Insights";
+import About from "./pages/About";
 import Layout from "./components/layout/Layout";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/recipe/:id" element={<RecipeDetails />} />
           <Route path="/cook/:id" element={<CookingMode />} />
           <Route path="/insights" element={<Insights />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </Layout>
     </Router>

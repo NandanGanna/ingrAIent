@@ -10,7 +10,8 @@ import {
   Menu, 
   X, 
   AlertTriangle,
-  Leaf
+  Leaf,
+  Info
 } from 'lucide-react';
 import { getPantry, getExpiryStatus, getSavedRecipes } from '../../utils/pantry';
 
@@ -73,6 +74,12 @@ export default function Layout({ children }: LayoutProps) {
       to: '/insights', 
       label: 'Kitchen Insights', 
       icon: BarChart3,
+      badge: null
+    },
+    { 
+      to: '/about', 
+      label: 'About', 
+      icon: Info,
       badge: null
     },
   ];
