@@ -5,7 +5,6 @@ import {
   ChefHat, 
   Users, 
   Sparkles, 
-  CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
   ArrowLeft, 
@@ -15,7 +14,6 @@ import {
 } from 'lucide-react';
 import { fetchRecipeById } from '../services/api';
 import { getPantry, getSavedRecipes, toggleSaveRecipe, type PantryItem } from '../utils/pantry';
-import { getIngredientImage } from '../utils/ingredients';
 import { calculateRecipeMatch } from '../utils/recipeScorer';
 import type { Recipe, RecipeIngredient, RecipeSubstitution } from '../types';
 
@@ -171,92 +169,69 @@ export default function RecipeDetails() {
         </div>
       </div>
 
-      {/* Hero Dish Section */}
-      <div className="relative rounded-3xl overflow-hidden bg-white border border-[#E7E9E1] shadow-md">
-        <div className="relative h-80 sm:h-96 w-full overflow-hidden bg-gray-100">
-          <img
-            src={recipe.image}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const fallbacks = [
-                'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80'
-              ];
-              let h = 0;
-              for (let i = 0; i < (recipe.title || '').length; i++) h += recipe.title.charCodeAt(i);
-              (e.currentTarget as HTMLImageElement).src = fallbacks[h % fallbacks.length];
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
+      {/* Hero Dish Section (Editorial Image-Free Banner) */}
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#244C3A] via-[#2d5c47] to-[#1c3d2f] text-white p-8 sm:p-10 border border-[#1e3f30] shadow-xl">
+        <div className="space-y-4 max-w-3xl">
           {/* Floating Badges */}
-          <div className="absolute top-4 left-4 flex gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#D9E9A5] text-[#244C3A] shadow-md">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#D9E9A5] text-[#244C3A] shadow-sm">
               {recipe.cuisine}
             </span>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/90 text-[#242A25] shadow-md">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white backdrop-blur-sm">
               {recipe.difficulty}
             </span>
-          </div>
-
-          <div className="absolute top-4 right-4">
-            <div className={`px-4 py-1.5 rounded-full text-xs font-extrabold shadow-lg flex items-center gap-1.5 ${
+            <div className={`px-3.5 py-1 rounded-full text-xs font-extrabold shadow-sm flex items-center gap-1.5 ${
               matchResult.matchPercentage >= 80 
-                ? 'bg-[#244C3A] text-[#D9E9A5] border border-[#D9E9A5]/40' 
-                : 'bg-white text-[#242A25]'
+                ? 'bg-[#D9E9A5]/30 text-[#D9E9A5] border border-[#D9E9A5]/40' 
+                : 'bg-white/20 text-white'
             }`}>
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>{matchResult.matchPercentage}% Pantry Match</span>
             </div>
           </div>
 
           {/* Title & Tagline in Hero */}
-          <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               {recipe.title}
             </h1>
-            <p className="text-sm text-white/90 line-clamp-2 max-w-2xl font-light leading-relaxed">
+            <p className="text-sm text-white/90 max-w-2xl font-light leading-relaxed">
               {recipe.description}
             </p>
           </div>
         </div>
 
         {/* Recipe Meta Strip */}
-        <div className="p-5 bg-white border-t border-[#E7E9E1] grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          <div className="p-3 rounded-2xl bg-[#F8F7F1]">
-            <span className="text-[10px] uppercase font-bold text-[#66756A] block mb-1">Prep Time</span>
-            <div className="text-base font-extrabold text-[#242A25] flex items-center justify-center gap-1">
-              <Clock className="w-4 h-4 text-[#A8BDA5]" />
+        <div className="mt-8 pt-6 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+            <span className="text-[10px] uppercase font-bold text-[#A8BDA5] block mb-1">Prep Time</span>
+            <div className="text-base font-extrabold text-white flex items-center justify-center gap-1">
+              <Clock className="w-4 h-4 text-[#D9E9A5]" />
               {recipe.prepTimeMinutes} mins
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#F8F7F1]">
-            <span className="text-[10px] uppercase font-bold text-[#66756A] block mb-1">Cook Time</span>
-            <div className="text-base font-extrabold text-[#242A25] flex items-center justify-center gap-1">
-              <ChefHat className="w-4 h-4 text-[#A8BDA5]" />
+          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+            <span className="text-[10px] uppercase font-bold text-[#A8BDA5] block mb-1">Cook Time</span>
+            <div className="text-base font-extrabold text-white flex items-center justify-center gap-1">
+              <Clock className="w-4 h-4 text-[#D9E9A5]" />
               {recipe.cookTimeMinutes} mins
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#F8F7F1]">
-            <span className="text-[10px] uppercase font-bold text-[#66756A] block mb-1">Available In Pantry</span>
-            <div className="text-base font-extrabold text-emerald-700 flex items-center justify-center gap-1">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              {matchResult.availableIngredients.length} items
+          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+            <span className="text-[10px] uppercase font-bold text-[#A8BDA5] block mb-1">Total Time</span>
+            <div className="text-base font-extrabold text-white flex items-center justify-center gap-1">
+              <Clock className="w-4 h-4 text-[#D9E9A5]" />
+              {recipe.prepTimeMinutes + recipe.cookTimeMinutes} mins
             </div>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#F8F7F1]">
-            <span className="text-[10px] uppercase font-bold text-[#66756A] block mb-1">Missing Ingredients</span>
-            <div className="text-base font-extrabold text-amber-700 flex items-center justify-center gap-1">
-              <AlertCircle className="w-4 h-4 text-amber-600" />
-              {matchResult.missingIngredients.length} items
+          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+            <span className="text-[10px] uppercase font-bold text-[#A8BDA5] block mb-1">Servings</span>
+            <div className="text-base font-extrabold text-white flex items-center justify-center gap-1">
+              <Users className="w-4 h-4 text-[#D9E9A5]" />
+              {currentServings} people
             </div>
           </div>
         </div>
@@ -335,7 +310,6 @@ export default function RecipeDetails() {
             const isAvail = matchResult.availableIngredients.some(
               a => a.toLowerCase() === ing.name.toLowerCase()
             );
-            const imgUrl = getIngredientImage(ing.name, ing.category);
             const sub = recipe.substitutions?.find(s => s.original.toLowerCase() === ing.name.toLowerCase());
             const isSubstituted = Boolean(appliedSubstitutions[ing.name]);
 
@@ -349,14 +323,9 @@ export default function RecipeDetails() {
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <img
-                    src={imgUrl}
-                    alt={ing.name}
-                    className="w-12 h-12 rounded-xl object-cover border border-[#E7E9E1] shrink-0"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80';
-                    }}
-                  />
+                  <div className="w-11 h-11 rounded-xl bg-[#F8F7F1] border border-[#E7E9E1] flex items-center justify-center shrink-0 text-[#244C3A]">
+                    <ChefHat className="w-5 h-5 text-[#244C3A]" />
+                  </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="font-bold text-sm text-[#242A25] truncate">

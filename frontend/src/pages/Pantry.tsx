@@ -9,7 +9,8 @@ import {
   RefreshCw, 
   X, 
   FileText,
-  ShoppingBag
+  ShoppingBag,
+  ChefHat
 } from 'lucide-react';
 import { 
   getPantry, 
@@ -451,41 +452,26 @@ export default function Pantry() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredItems.map(item => {
             const expStatus = getExpiryStatus(item.expiry);
-            const imgUrl = getIngredientImage(item.name, item.category);
 
             return (
               <div
                 key={item.id}
                 className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-[#E7E9E1] hover:border-[#A8BDA5] hover:shadow-md transition-all flex flex-col justify-between"
               >
-                <div>
-                  {/* Card Image */}
-                  <div className="relative h-40 w-full bg-gray-100 overflow-hidden">
-                    <img
-                      src={imgUrl}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80';
-                      }}
-                    />
-                    <div className="absolute top-2.5 left-2.5">
-                      <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-[#1A3D2F] text-white shadow-md">
-                        {item.category}
-                      </span>
-                    </div>
-
+                <div className="p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-[#244C3A] text-[#D9E9A5] shadow-sm">
+                      {item.category}
+                    </span>
                     {expStatus && (
-                      <div className="absolute top-2.5 right-2.5">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border shadow-md ${expStatus.badgeColor}`}>
-                          {expStatus.label}
-                        </span>
-                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold border shadow-sm ${expStatus.badgeColor}`}>
+                        {expStatus.label}
+                      </span>
                     )}
                   </div>
 
                   {/* Card Content */}
-                  <div className="p-4 space-y-2.5">
+                  <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-extrabold text-[#111C15] text-lg leading-snug tracking-tight">
                         {item.name}
@@ -841,11 +827,9 @@ export default function Pantry() {
                     key={item.id}
                     className="p-3 bg-[#F8F7F1] rounded-2xl border border-[#E7E9E1] flex flex-wrap sm:flex-nowrap items-center gap-3"
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-[#E7E9E1]"
-                    />
+                    <div className="w-11 h-11 rounded-xl bg-white border border-[#E7E9E1] flex items-center justify-center shrink-0 text-[#244C3A]">
+                      <ChefHat className="w-5 h-5 text-[#244C3A]" />
+                    </div>
                     <div className="flex-1 min-w-[120px]">
                       <span className="font-bold text-sm text-[#242A25] block">{item.name}</span>
                       <span className="text-[11px] text-[#66756A]">{item.category}</span>

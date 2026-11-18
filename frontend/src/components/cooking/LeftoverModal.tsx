@@ -8,7 +8,6 @@ import {
   ChefHat
 } from 'lucide-react';
 import { getPantry, savePantry, recordCookedRecipe } from '../../utils/pantry';
-import { getIngredientImage } from '../../utils/ingredients';
 import type { Recipe } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -139,18 +138,15 @@ export default function LeftoverModal({ recipe, servingsCooked, onClose }: Lefto
             {/* Deductions table */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {deductions.map((item, idx) => {
-                const img = getIngredientImage(item.ingredientName);
                 return (
                   <div
                     key={idx}
                     className="p-3 bg-white rounded-2xl border border-[#E7E9E1] flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <img
-                        src={img}
-                        alt={item.ingredientName}
-                        className="w-10 h-10 rounded-xl object-cover border border-[#E7E9E1] shrink-0"
-                      />
+                      <div className="w-10 h-10 rounded-xl bg-[#F8F7F1] border border-[#E7E9E1] flex items-center justify-center shrink-0 text-[#244C3A]">
+                        <ChefHat className="w-4 h-4 text-[#244C3A]" />
+                      </div>
                       <div className="truncate">
                         <span className="font-bold text-[#242A25] block truncate">
                           {item.ingredientName}

@@ -4,9 +4,9 @@ const { validateIngredientItem } = require('../validators/foodValidator');
 
 const RecipeIngredientSchema = z.object({
   name: z.string(),
-  quantity: z.number(),
-  unit: z.string(),
-  available: z.boolean().default(false),
+  quantity: z.number().default(1),
+  unit: z.string().default('pcs'),
+  available: z.boolean().default(true),
   required: z.boolean().default(true),
   optional: z.boolean().default(false),
   category: z.string().optional(),
@@ -15,7 +15,7 @@ const RecipeIngredientSchema = z.object({
 
 const RecipeStepSchema = z.object({
   instruction: z.string(),
-  durationMinutes: z.number().optional(),
+  durationMinutes: z.number().optional().default(5),
 });
 
 const RecipeSubstitutionSchema = z.object({
@@ -29,9 +29,9 @@ const RecipeSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
-  cuisine: z.string(),
-  prepTimeMinutes: z.number().default(15),
-  cookTimeMinutes: z.number().default(20),
+  cuisine: z.string().default('Continental'),
+  prepTimeMinutes: z.number().default(10),
+  cookTimeMinutes: z.number().default(15),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']).default('Easy'),
   servings: z.number().default(2),
   ingredients: z.array(RecipeIngredientSchema),
@@ -45,63 +45,86 @@ const GeneratedResponseSchema = z.object({
   recipes: z.array(RecipeSchema),
 });
 
-const DISH_IMAGE_REGISTRY = [
-  { keywords: ['paneer bhurji', 'cottage cheese scramble'], url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['paneer', 'cottage cheese'], url: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['yellow dal', 'dal tadka', 'tadka dal', 'lentil dal', 'lentil soup', 'dal'], url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['matar pulao', 'vegetable pulao', 'pulao', 'pilaf', 'biryani'], url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['egg fried rice', 'fried rice', 'wok rice'], url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['pasta', 'penne', 'spaghetti', 'fettuccine', 'fusilli', 'macaroni'], url: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['noodles', 'ramen', 'chow mein', 'pad thai'], url: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['masala omelette', 'omelette', 'omelet'], url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['shakshuka', 'frittata', 'scrambled egg', 'scramble'], url: 'https://images.unsplash.com/photo-1590412200988-a436970781fa?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['egg', 'eggs'], url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['soup', 'broth', 'stew', 'chowder'], url: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['salad', 'bowl', 'lettuce', 'slaw'], url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['chicken', 'tikka', 'poultry'], url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['fish', 'salmon', 'prawn', 'shrimp', 'seafood'], url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['sandwich', 'toast', 'burger', 'wrap'], url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80' },
-  { keywords: ['curry', 'masala', 'sabzi', 'stir fry', 'vegetable'], url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80' },
-];
+// Helper to normalize ingredient strings for exact/fuzzy allowlist matching
+function normalizeIng(name) {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
-const DISH_IMAGE_FALLBACKS = [
-  'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
-];
+// Build allowed tokens and canonical variations from user pantry
+function buildAllowlistIndex(validPantry) {
+  const allowedNorms = new Set();
+  const allowedRoots = new Set();
 
-// Persistent image cache to ensure reopening the same recipe displays the exact same image
-const recipeImageCache = new Map();
+  for (const item of validPantry) {
+    const rawNorm = normalizeIng(item.name);
+    allowedNorms.add(rawNorm);
 
-function getDishImage(title, cuisine = '', index = 0) {
-  const normKey = title.trim().toLowerCase();
-  if (recipeImageCache.has(normKey)) {
-    return recipeImageCache.get(normKey);
-  }
-
-  // Find exact keyword matches from registry
-  for (const entry of DISH_IMAGE_REGISTRY) {
-    if (entry.keywords.some(k => normKey.includes(k))) {
-      recipeImageCache.set(normKey, entry.url);
-      return entry.url;
+    // Also check canonical name from validator
+    const val = validateIngredientItem(item.name);
+    if (val.canonicalName) {
+      allowedNorms.add(normalizeIng(val.canonicalName));
     }
+
+    // Split words for partial matching (e.g. "red tomato" -> "tomato")
+    rawNorm.split(' ').forEach(w => {
+      if (w.length > 2) allowedRoots.add(w);
+    });
   }
 
-  // Fallback deterministically by hash of title
-  let hash = 0;
-  for (let i = 0; i < normKey.length; i++) {
-    hash = (hash << 5) - hash + normKey.charCodeAt(i);
-    hash |= 0;
-  }
-  const fallbackIndex = Math.abs(hash + index) % DISH_IMAGE_FALLBACKS.length;
-  const selected = DISH_IMAGE_FALLBACKS[fallbackIndex];
-  recipeImageCache.set(normKey, selected);
-  return selected;
+  return {
+    isAllowed(ingredientName) {
+      const norm = normalizeIng(ingredientName);
+      if (allowedNorms.has(norm)) return true;
+
+      // Check canonical match
+      const val = validateIngredientItem(ingredientName);
+      if (val.canonicalName && allowedNorms.has(normalizeIng(val.canonicalName))) {
+        return true;
+      }
+
+      // Check substring match (e.g. "chopped tomato" containing "tomato")
+      for (const allowed of allowedNorms) {
+        if (norm.includes(allowed) || allowed.includes(norm)) {
+          return true;
+        }
+      }
+
+      // Check root word match (e.g. "tomatoes" vs "tomato")
+      for (const root of allowedRoots) {
+        if (norm.startsWith(root) || norm.includes(root)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  };
+}
+
+async function callGeminiWithTimeout(ai, modelName, contents, timeoutMs = 28000) {
+  const apiCallPromise = ai.models.generateContent({
+    model: modelName,
+    contents,
+    config: {
+      responseMimeType: 'application/json',
+    }
+  });
+
+  const timeoutPromise = new Promise((_, reject) => {
+    const timer = setTimeout(() => {
+      const err = new Error(`Gemini generation timed out after ${Math.round(timeoutMs / 1000)}s on model ${modelName}`);
+      err.code = 'TIMEOUT';
+      reject(err);
+    }, timeoutMs);
+    apiCallPromise.finally(() => clearTimeout(timer));
+  });
+
+  return Promise.race([apiCallPromise, timeoutPromise]);
 }
 
 async function generateRecipesWithGemini(requestData) {
@@ -126,11 +149,11 @@ async function generateRecipesWithGemini(requestData) {
     quickFilter = ''
   } = requestData;
 
-  // Filter valid pantry items and separate expiring ones
+  // Filter valid edible pantry items
   const validPantry = [];
   const expiringPantry = [];
-
   const now = new Date();
+
   for (const item of pantryIngredients) {
     const val = validateIngredientItem(item.name);
     if (val.status === 'valid') {
@@ -153,29 +176,33 @@ async function generateRecipesWithGemini(requestData) {
   }
 
   if (validPantry.length === 0) {
-    const error = new Error('No valid edible food ingredients provided in pantry.');
+    const error = new Error('No valid edible food ingredients selected in pantry.');
     error.code = 'NO_VALID_INGREDIENTS';
     throw error;
   }
 
-  // Construct prompt
+  const allowlistIndex = buildAllowlistIndex(validPantry);
   const pantryListStr = validPantry.map(i => `- ${i.name} (${i.quantity} ${i.unit})${i.expiry ? ` [Expiry: ${i.expiry}]` : ''}`).join('\n');
+  const allowedNamesList = validPantry.map(i => i.name).join(', ');
+
   const expiringStr = expiringPantry.length > 0 
     ? `PRIORITY EXPIRING INGREDIENTS (MUST PRIORITIZE USING THESE FIRST):\n${expiringPantry.map(i => `- ${i.name}`).join('\n')}`
     : 'None expiring urgently.';
 
-  const systemPrompt = `You are IngrAIent, an elite culinary AI chef specializing in kitchen intelligence and zero food waste.
-Your mission is to invent 3 DISTINCT, mouthwatering recipes utilizing the user's available pantry ingredients, prioritizing those expiring soon.
+  function constructPrompt(violationNotice = '') {
+    return `You are IngrAIent, an elite culinary AI chef specializing in kitchen intelligence and zero food waste.
+Your mission is to invent 3 DISTINCT, delicious recipes utilizing ONLY the user's available pantry ingredients.
 
-CRITICAL FOOD SAFETY & HYGIENE RULES:
-1. ONLY propose real, edible culinary food ingredients. Never include non-food items, household chemicals, or dangerous items.
-2. Every ingredient MUST be a realistic culinary item.
-3. Clearly mark each recipe's ingredients:
-   - "available": true if the user already has this ingredient in their pantry list
-   - "required": true if essential to the dish, false if optional/garnish
-   - "optional": true if it can be omitted without ruining the dish
-4. Always provide 2-3 realistic substitutions for ingredients that might be missing or optional.
-5. All cooking steps MUST have practical instructions and approximate durationMinutes.
+${violationNotice ? `⚠️ REGENERATION CORRECTION REQUIRED:\n${violationNotice}\n` : ''}
+
+CRITICAL ZERO-ASSUMPTION INGREDIENT RESTRICTION (STRICT ALLOWLIST):
+1. You may ONLY use ingredients that are explicitly listed in the USER PANTRY INVENTORY below: [${allowedNamesList}].
+2. You MUST NOT add, assume, or introduce ANY unlisted ingredients—including salt, black pepper, cooking oil, butter, ghee, water, garlic, onions, sugar, or unlisted spices—UNLESS they appear in the allowed list above.
+3. Every single ingredient in your recipes MUST be chosen from the allowed list. Do NOT invent staples.
+4. Adapt cooking methods (dry roasting, steaming, grilling, searing in the food's natural juices) to make incredible dishes using STRICTLY the provided ingredients.
+5. All ingredients in the recipe MUST have "available": true.
+6. Only propose real, edible culinary food. Never propose non-food items.
+7. Provide practical cooking steps with approximate durationMinutes.
 
 USER PREFERENCES:
 - Cuisine: ${cuisinePreference}
@@ -187,7 +214,7 @@ USER PREFERENCES:
 ${quickFilter ? `- Quick Filter Goal: ${quickFilter}` : ''}
 ${additionalInstructions ? `- Special Instructions: ${additionalInstructions}` : ''}
 
-USER PANTRY INVENTORY:
+USER PANTRY INVENTORY (THE ONLY ALLOWED INGREDIENTS):
 ${pantryListStr}
 
 ${expiringStr}
@@ -198,8 +225,8 @@ Return a JSON object conforming strictly to this format:
     {
       "id": "recipe-unique-slug",
       "title": "Dish Title",
-      "description": "Engaging description explaining flavor profile and how it uses pantry ingredients",
-      "cuisine": "Indian" | "Italian" | "Mexican" | "Asian" | "Continental" | etc.,
+      "description": "Engaging description explaining flavor profile and how it uses the selected ingredients",
+      "cuisine": "${cuisinePreference !== 'Any' ? cuisinePreference : 'Continental'}",
       "prepTimeMinutes": number,
       "cookTimeMinutes": number,
       "difficulty": "Easy" | "Medium" | "Hard",
@@ -207,66 +234,64 @@ Return a JSON object conforming strictly to this format:
       "tags": ["Tag1", "Tag2"],
       "ingredients": [
         {
-          "name": "Ingredient Name",
+          "name": "Ingredient Name (MUST be from the allowed pantry list)",
           "quantity": number,
           "unit": "g" | "kg" | "ml" | "L" | "pcs" | "tbsp" | "tsp" | "cup" | "cloves",
-          "available": boolean,
-          "required": boolean,
-          "optional": boolean,
-          "notes": "optional preparation note like 'finely diced'"
+          "available": true,
+          "required": true,
+          "optional": false,
+          "notes": "optional prep note like 'sliced'"
         }
       ],
       "steps": [
         {
-          "instruction": "Clear step instruction",
+          "instruction": "Clear cooking step using ONLY allowed ingredients",
           "durationMinutes": number
         }
       ],
-      "substitutions": [
-        {
-          "original": "Ingredient",
-          "substitute": "Alternative",
-          "ratio": "1:1",
-          "notes": "Why this substitution works"
-        }
-      ]
+      "substitutions": []
     }
   ]
 }`;
+  }
 
-  // Prefer gemini-3.5-flash for fastest, most stable responses; fallback to gemini-3.8-flash on demand spikes
-  const requestedModel = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const requestedModel = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+  // High-speed low-latency models with graceful fallbacks
   const modelCandidates = [
     requestedModel,
-    requestedModel === 'gemini-3.5-flash' ? 'gemini-3.8-flash' : 'gemini-3.5-flash'
-  ];
+    'gemini-3.1-flash-lite',
+    'gemini-3.7-flash',
+    'gemini-3.8-flash'
+  ].filter((v, i, a) => a.indexOf(v) === i);
 
-  let responseText = '';
+  let rawParsed = null;
+  let validationErrors = null;
   let lastError = null;
 
-  for (const modelName of modelCandidates) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
+  // Outer loop: up to 2 attempts (initial attempt + 1 controlled retry if allowlist violation occurs)
+  for (let generationRound = 1; generationRound <= 2; generationRound++) {
+    const violationMsg = validationErrors ? `Previous response included unallowed ingredients: ${validationErrors.join(', ')}. Please strictly use ONLY: ${allowedNamesList}.` : '';
+    const promptText = constructPrompt(violationMsg);
+
+    let responseText = '';
+    for (const modelName of modelCandidates) {
+      const callStart = Date.now();
       try {
-        console.log(`[GEMINI_REQUEST] Invoking model: ${modelName} (attempt ${attempt}/2)`);
-        const response = await ai.models.generateContent({
-          model: modelName,
-          contents: systemPrompt,
-          config: {
-            responseMimeType: 'application/json',
-          }
-        });
+        console.log(`[GEMINI_START] Invoking model: ${modelName} | Round: ${generationRound}/2 | Time: ${new Date().toISOString()}`);
+        const response = await callGeminiWithTimeout(ai, modelName, promptText, 28000);
         responseText = response.text;
+        const callDuration = Date.now() - callStart;
+        console.log(`[GEMINI_COMPLETE] Model ${modelName} responded successfully in ${callDuration}ms`);
         lastError = null;
-        console.log(`[GEMINI_SUCCESS] Received response from model: ${modelName}`);
-        break;
+        break; // Success on this candidate
       } catch (apiError) {
+        const callDuration = Date.now() - callStart;
         lastError = apiError;
         const errMsg = apiError.message || '';
-        console.warn(`[GEMINI_WARN] Model ${modelName} attempt ${attempt}/2 failed: ${errMsg}`);
-        
-        // Check for non-retryable errors immediately
-        if (errMsg.includes('API_KEY_INVALID') || apiError.status === 400 && errMsg.includes('key')) {
-          const err = new Error('Invalid Gemini API key. Please check your credentials.');
+        console.warn(`[GEMINI_WARN] Model ${modelName} failed after ${callDuration}ms: ${errMsg}`);
+
+        if (errMsg.includes('API_KEY_INVALID') || (apiError.status === 400 && errMsg.includes('key'))) {
+          const err = new Error('Invalid Gemini API key. Please check your credentials in backend/.env.');
           err.code = 'INVALID_API_KEY';
           throw err;
         }
@@ -277,88 +302,114 @@ Return a JSON object conforming strictly to this format:
           throw err;
         }
 
-        // On 503 demand spike or timeout, back off briefly or try alternative model
-        if (attempt === 1 && (apiError.status === 503 || errMsg.includes('503') || errMsg.includes('demand'))) {
-          console.log(`[GEMINI_RETRY] Temporary demand spike on ${modelName}, waiting 1s before retry...`);
-          await new Promise(res => setTimeout(res, 1000));
-        } else {
-          // Break to next candidate model
+        // If timeout or 503, try next candidate
+        continue;
+      }
+    }
+
+    if (!responseText) {
+      if (lastError?.code === 'TIMEOUT') {
+        const err = new Error('Recipe generation timed out. The AI servers took too long to respond. Please retry.');
+        err.code = 'TIMEOUT';
+        throw err;
+      }
+      const err = new Error(
+        lastError?.status === 503 || lastError?.message?.includes('503')
+          ? 'Google AI servers are currently experiencing high demand. Please click Retry.'
+          : `Gemini API call failed: ${lastError ? lastError.message : 'No response received'}`
+      );
+      err.code = lastError?.status === 503 ? 'UNAVAILABLE_503' : (lastError?.code || 'GEMINI_CALL_FAILED');
+      throw err;
+    }
+
+    // Parse JSON
+    try {
+      rawParsed = JSON.parse(responseText);
+    } catch (jsonErr) {
+      console.error('[PARSE_ERROR] Model did not return valid JSON:', responseText.slice(0, 200));
+      if (generationRound === 1) {
+        validationErrors = ['Malformed JSON response from model'];
+        continue;
+      }
+      const err = new Error('The AI generated an incompatible recipe format. Please click Retry.');
+      err.code = 'MALFORMED_AI_OUTPUT';
+      throw err;
+    }
+
+    // Zod schema check
+    const zodResult = GeneratedResponseSchema.safeParse(rawParsed);
+    if (!zodResult.success) {
+      console.warn('[ZOD_VALIDATION_WARN] Zod schema mismatch:', zodResult.error.issues);
+      if (generationRound === 1) {
+        validationErrors = ['Schema validation mismatch'];
+        continue;
+      }
+      const err = new Error('Generated recipes did not match strict validation schema.');
+      err.code = 'SCHEMA_VALIDATION_FAILED';
+      err.details = zodResult.error.format();
+      throw err;
+    }
+
+    // Validate ingredients against strict pantry allowlist
+    const recipes = zodResult.data.recipes;
+    const roundViolations = [];
+    const safeRecipes = [];
+
+    for (let idx = 0; idx < recipes.length; idx++) {
+      const rec = recipes[idx];
+      const validIngredients = [];
+      let recipeHasDisallowed = false;
+
+      for (const ing of rec.ingredients) {
+        const foodCheck = validateIngredientItem(ing.name);
+        if (foodCheck.status === 'non_food') {
+          console.warn(`[ALLOWLIST_REJECT] Non-food ingredient detected: ${ing.name}`);
+          roundViolations.push(ing.name);
+          recipeHasDisallowed = true;
           break;
         }
+
+        const isAllowed = allowlistIndex.isAllowed(ing.name);
+        if (!isAllowed) {
+          console.warn(`[ALLOWLIST_REJECT] Ingredient not in user pantry: "${ing.name}" for recipe "${rec.title}"`);
+          roundViolations.push(ing.name);
+          recipeHasDisallowed = true;
+          break;
+        }
+
+        validIngredients.push({
+          ...ing,
+          name: foodCheck.canonicalName || ing.name,
+          available: true
+        });
+      }
+
+      if (!recipeHasDisallowed && validIngredients.length >= 1) {
+        safeRecipes.push({
+          ...rec,
+          id: rec.id || `recipe-${Date.now()}-${idx}`,
+          ingredients: validIngredients,
+          isDemo: false
+        });
       }
     }
-    if (responseText) break;
-  }
 
-  if (lastError || !responseText) {
-    const err = new Error(
-      lastError?.message?.includes('503')
-        ? 'Gemini servers are currently experiencing high demand. Please retry.'
-        : `Gemini API call failed: ${lastError ? lastError.message : 'No response received'}`
-    );
-    err.code = lastError?.status === 503 ? 'UNAVAILABLE_503' : (lastError?.code || 'GEMINI_CALL_FAILED');
-    throw err;
-  }
-
-  // Parse JSON
-  let rawParsed;
-  try {
-    rawParsed = JSON.parse(responseText);
-  } catch (jsonErr) {
-    const err = new Error('Model did not return valid JSON');
-    err.code = 'MALFORMED_AI_OUTPUT';
-    throw err;
-  }
-
-  // Zod validate structure
-  const parseResult = GeneratedResponseSchema.safeParse(rawParsed);
-  if (!parseResult.success) {
-    console.error('AI response failed Zod validation:', parseResult.error);
-    const err = new Error('Generated recipes did not match strict validation schema');
-    err.code = 'SCHEMA_VALIDATION_FAILED';
-    err.details = parseResult.error.format();
-    throw err;
-  }
-
-  // Post-validate ingredients against non-food blacklist & food safety
-  const safeRecipes = [];
-  for (let idx = 0; idx < parseResult.data.recipes.length; idx++) {
-    const rec = parseResult.data.recipes[idx];
-    const sanitizedIngredients = [];
-
-    for (const ing of rec.ingredients) {
-      const val = validateIngredientItem(ing.name);
-      if (val.status === 'non_food') {
-        console.warn(`Rejecting non-food ingredient generated by AI: ${ing.name}`);
-        continue; // omit non-food items strictly!
-      }
-      sanitizedIngredients.push({
-        ...ing,
-        name: val.canonicalName || ing.name,
-      });
+    if (safeRecipes.length > 0) {
+      console.log(`[VALIDATION_SUCCESS] Generated ${safeRecipes.length} recipes strictly satisfying the pantry allowlist.`);
+      return safeRecipes;
     }
 
-    if (sanitizedIngredients.length >= 2) {
-      safeRecipes.push({
-        ...rec,
-        id: rec.id || `ai-recipe-${Date.now()}-${idx}`,
-        image: rec.image || getDishImage(rec.title, rec.cuisine, idx),
-        ingredients: sanitizedIngredients,
-        isDemo: false
-      });
-    }
+    // If all recipes had violations, record violations and retry once if round 1
+    console.warn(`[ROUND_${generationRound}_FAILED] All recipes contained unallowed ingredients: ${roundViolations.join(', ')}`);
+    validationErrors = roundViolations;
   }
 
-  if (safeRecipes.length === 0) {
-    const err = new Error('AI generated recipes contained invalid ingredients.');
-    err.code = 'UNSAFE_RECIPES';
-    throw err;
-  }
-
-  return safeRecipes;
+  // If both rounds failed to strictly satisfy allowlist
+  const err = new Error('Could not generate recipes using strictly the selected ingredients. Please select a few more ingredients or kitchen staples.');
+  err.code = 'STRICT_ALLOWLIST_VIOLATION';
+  throw err;
 }
 
 module.exports = {
-  generateRecipesWithGemini,
-  getDishImage
+  generateRecipesWithGemini
 };

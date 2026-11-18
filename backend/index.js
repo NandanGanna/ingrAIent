@@ -116,13 +116,31 @@ async function handleGenerate(req, res) {
     }
     console.warn(`[REQUEST_ERROR] ID: ${reqId} | Status: 400 | Category: MISSING_API_KEY | Duration: ${Date.now() - startTime}ms`);
     return res.status(400).json({
-      error: 'GEMINI_API_KEY is not configured on the backend.',
+      error: 'GEMINI_API_KEY is not configured on the backend. Please add GEMINI_API_KEY to backend/.env.',
       code: 'MISSING_API_KEY'
     });
   }
 
+  // Safety timer to prevent Express socket hanging indefinitely
+  let responseSent = false;
+  const timeoutGuard = setTimeout(() => {
+    if (!responseSent) {
+      responseSent = true;
+      const duration = Date.now() - startTime;
+      console.error(`[REQUEST_TIMEOUT] ID: ${reqId} | Status: 504 | Duration: ${duration}ms | Exceeded 45s safety limit`);
+      res.status(504).json({
+        error: 'Recipe generation timed out after 45 seconds. Please retry.',
+        code: 'TIMEOUT'
+      });
+    }
+  }, 45000);
+
   try {
     const generated = await generateRecipesWithGemini(req.body);
+    if (responseSent) return;
+    clearTimeout(timeoutGuard);
+    responseSent = true;
+
     // Cache generated recipes
     generated.forEach(r => recipeCache.set(r.id, r));
 
@@ -134,11 +152,24 @@ async function handleGenerate(req, res) {
       recipes: generated
     });
   } catch (err) {
+    if (responseSent) return;
+    clearTimeout(timeoutGuard);
+    responseSent = true;
+
     const duration = Date.now() - startTime;
     const category = err.code || (err.status === 503 ? 'UNAVAILABLE_503' : 'GENERATION_ERROR');
-    console.error(`[REQUEST_ERROR] ID: ${reqId} | Status: 500 | Category: ${category} | Duration: ${duration}ms | Message: ${err.message}`);
 
-    res.status(500).json({
+    let statusCode = 500;
+    if (category === 'MISSING_API_KEY' || category === 'NO_VALID_INGREDIENTS') statusCode = 400;
+    else if (category === 'INVALID_API_KEY') statusCode = 401;
+    else if (category === 'STRICT_ALLOWLIST_VIOLATION') statusCode = 422;
+    else if (category === 'QUOTA_EXCEEDED') statusCode = 429;
+    else if (category === 'UNAVAILABLE_503') statusCode = 503;
+    else if (category === 'TIMEOUT') statusCode = 504;
+
+    console.error(`[REQUEST_ERROR] ID: ${reqId} | Status: ${statusCode} | Category: ${category} | Duration: ${duration}ms | Message: ${err.message}`);
+
+    res.status(statusCode).json({
       error: err.message || 'Failed to generate recipes with Gemini AI.',
       code: category,
       details: err.details
@@ -173,6 +204,6 @@ app.listen(PORT, () => {
   console.log(`IngrAIent Backend running on port ${PORT}`);
   console.log(`Brand: IngrAIent — Turn ingredients into inspiration.`);
   console.log(`Gemini API configured: ${Boolean(process.env.GEMINI_API_KEY)}`);
-  console.log(`Gemini Model: ${process.env.GEMINI_MODEL || 'gemini-3.5-flash'}`);
+  console.log(`Gemini Model: ${process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'}`);
   console.log(`===============================================`);
 });

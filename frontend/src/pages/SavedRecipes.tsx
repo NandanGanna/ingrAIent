@@ -114,7 +114,17 @@ export default function SavedRecipes() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2].map(n => (
-            <div key={n} className="bg-white rounded-3xl h-80 animate-pulse border border-[#E7E9E1]" />
+            <div key={n} className="bg-white rounded-3xl p-6 border border-[#E7E9E1] animate-pulse space-y-4 shadow-sm min-h-[260px]">
+              <div className="flex justify-between items-center">
+                <div className="h-6 bg-gray-200 rounded-full w-24" />
+                <div className="h-8 bg-gray-100 rounded-xl w-8" />
+              </div>
+              <div className="space-y-2 pt-2">
+                <div className="h-6 bg-gray-200 rounded-xl w-3/4" />
+                <div className="h-4 bg-gray-100 rounded-lg w-full" />
+              </div>
+              <div className="h-10 bg-gray-100 rounded-xl w-full mt-4" />
+            </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -144,53 +154,32 @@ export default function SavedRecipes() {
             <div
               key={recipe.id}
               onClick={() => navigate(`/recipe/${recipe.id}`)}
-              className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm border border-[#E7E9E1] hover:shadow-xl hover:border-[#A8BDA5] transition-all flex flex-col justify-between"
+              className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm border border-[#E7E9E1] hover:shadow-xl hover:border-[#244C3A] transition-all flex flex-col justify-between"
             >
-              <div>
-                <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={recipe.image}
-                    alt={recipe.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      const fallbacks = [
-                        'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
-                        'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-                        'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
-                        'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
-                        'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80',
-                        'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80'
-                      ];
-                      let h = 0;
-                      for (let i = 0; i < (recipe.title || '').length; i++) h += recipe.title.charCodeAt(i);
-                      (e.currentTarget as HTMLImageElement).src = fallbacks[h % fallbacks.length];
-                    }}
-                  />
-
-                  <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#244C3A] text-[#D9E9A5] shadow-md flex items-center gap-1">
+              <div className="p-6 space-y-4">
+                {/* Header: Match, Cuisine, Trash */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#244C3A] text-[#D9E9A5] shadow-sm flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5" />
-                      {recipe.matchScore}% Match
+                      {recipe.matchScore || 85}% Match
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F8F7F1] text-[#66756A] border border-[#E7E9E1]">
+                      {recipe.cuisine}
                     </span>
                   </div>
 
                   <button
                     onClick={(e) => handleRemove(e, recipe.id)}
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/90 text-rose-600 hover:bg-rose-600 hover:text-white shadow-md transition-all"
+                    className="p-2 rounded-xl bg-[#F8F7F1] text-rose-600 hover:bg-rose-50 border border-[#E7E9E1] hover:border-rose-200 transition-all"
                     title="Remove from saved"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-
-                  <div className="absolute bottom-3 left-3 flex gap-1.5">
-                    <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-black/60 text-white backdrop-blur-sm">
-                      {recipe.cuisine}
-                    </span>
-                  </div>
                 </div>
 
-                <div className="p-5 space-y-2">
-                  <h3 className="text-xl font-bold text-[#242A25] group-hover:text-[#244C3A] transition-colors leading-snug">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-extrabold text-[#242A25] group-hover:text-[#244C3A] transition-colors leading-snug">
                     {recipe.title}
                   </h3>
                   <p className="text-xs text-[#66756A] line-clamp-2 leading-relaxed">
@@ -199,14 +188,14 @@ export default function SavedRecipes() {
                 </div>
               </div>
 
-              <div className="px-5 pb-5 pt-3 border-t border-[#E7E9E1] flex items-center justify-between text-xs text-[#66756A]">
+              <div className="px-6 pb-5 pt-3 border-t border-[#E7E9E1] bg-[#FCFBF8] flex items-center justify-between text-xs text-[#66756A]">
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#A8BDA5]" />
                   <span>{recipe.prepTimeMinutes + recipe.cookTimeMinutes} mins</span>
                 </div>
-                <div className="flex items-center gap-1.5 font-bold text-[#244C3A]">
+                <div className="flex items-center gap-1.5 font-bold text-[#244C3A] group-hover:translate-x-0.5 transition-transform">
                   <span>Cook Now</span>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
             </div>

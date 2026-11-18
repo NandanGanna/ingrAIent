@@ -8,7 +8,7 @@ const API_BASE_URL = rawApiUrl
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 90000, // 90s timeout for generative AI recipes
+  timeout: 50000, // 50s timeout for generative AI recipes (clean error boundary)
   headers: {
     'Content-Type': 'application/json',
   },

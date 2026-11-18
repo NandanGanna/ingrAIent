@@ -12,7 +12,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { getPantry, getExpiryStatus, getSavedRecipes, type PantryItem } from '../utils/pantry';
-import { getIngredientImage } from '../utils/ingredients';
 import { fetchAllRecipes } from '../services/api';
 import { enrichRecipesWithPantry } from '../utils/recipeScorer';
 import type { Recipe } from '../types';
@@ -183,21 +182,15 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {expiringItems.map(({ item, status }) => {
-              const imgUrl = getIngredientImage(item.name, item.category);
               return (
                 <div
                   key={item.id}
                   onClick={() => navigate(`/discover?search=${encodeURIComponent(item.name)}`)}
                   className="group cursor-pointer bg-white rounded-2xl p-4 shadow-sm border border-[#E7E9E1] hover:shadow-md hover:border-[#A8BDA5] transition-all flex items-center gap-4"
                 >
-                  <img
-                    src={imgUrl}
-                    alt={item.name}
-                    className="w-16 h-16 rounded-xl object-cover border border-[#E7E9E1] group-hover:scale-105 transition-transform"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80';
-                    }}
-                  />
+                  <div className="w-14 h-14 rounded-2xl bg-[#F8F7F1] border border-[#E7E9E1] flex items-center justify-center shrink-0 text-[#244C3A] group-hover:scale-105 transition-transform">
+                    <Clock className="w-6 h-6 text-[#244C3A]" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border font-semibold ${status?.badgeColor}`}>
@@ -236,7 +229,18 @@ export default function Dashboard() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((n) => (
-              <div key={n} className="bg-white rounded-2xl h-80 animate-pulse border border-[#E7E9E1]" />
+              <div key={n} className="bg-white rounded-3xl p-6 border border-[#E7E9E1] animate-pulse space-y-4 shadow-sm min-h-[280px]">
+                <div className="flex justify-between items-center">
+                  <div className="h-6 bg-gray-200 rounded-full w-24" />
+                  <div className="h-6 bg-gray-100 rounded-lg w-16" />
+                </div>
+                <div className="space-y-2 pt-2">
+                  <div className="h-6 bg-gray-200 rounded-xl w-3/4" />
+                  <div className="h-4 bg-gray-100 rounded-lg w-full" />
+                </div>
+                <div className="h-8 bg-gray-100 rounded-xl w-full" />
+                <div className="h-10 bg-gray-100 rounded-xl w-full mt-4" />
+              </div>
             ))}
           </div>
         ) : (
@@ -245,55 +249,33 @@ export default function Dashboard() {
               <div
                 key={recipe.id}
                 onClick={() => navigate(`/recipe/${recipe.id}`)}
-                className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm border border-[#E7E9E1] hover:shadow-xl hover:border-[#A8BDA5] transition-all flex flex-col justify-between"
+                className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-sm border border-[#E7E9E1] hover:shadow-xl hover:border-[#244C3A] transition-all flex flex-col justify-between"
               >
-                <div>
-                  {/* Recipe Image with Match Badge */}
-                  <div className="relative h-48 w-full overflow-hidden bg-gray-100">
-                    <img
-                      src={recipe.image}
-                      alt={recipe.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        const fallbacks = [
-                          'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80',
-                          'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'
-                        ];
-                        let h = 0;
-                        for (let i = 0; i < recipe.title.length; i++) h += recipe.title.charCodeAt(i);
-                        (e.currentTarget as HTMLImageElement).src = fallbacks[h % fallbacks.length];
-                      }}
-                    />
-                    <div className="absolute top-3 right-3">
-                      <div className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1 ${
-                        (recipe.matchScore || 0) >= 80 
-                          ? 'bg-[#244C3A] text-[#D9E9A5]' 
-                          : 'bg-white/95 text-[#242A25]'
-                      }`}>
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>{recipe.matchScore}% Match</span>
-                      </div>
+                <div className="p-6 space-y-4">
+                  {/* Card Header: Match Badge & Cuisine */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5 ${
+                      (recipe.matchScore || 0) >= 80 
+                        ? 'bg-[#244C3A] text-[#D9E9A5]' 
+                        : 'bg-amber-100 text-amber-900 border border-amber-200'
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{recipe.matchScore || 85}% Match</span>
                     </div>
 
-                    <div className="absolute bottom-3 left-3 flex gap-1.5">
-                      <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-black/60 text-white backdrop-blur-sm">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F8F7F1] text-[#66756A] border border-[#E7E9E1]">
                         {recipe.cuisine}
                       </span>
-                      <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-black/60 text-white backdrop-blur-sm">
+                      <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F8F7F1] text-[#66756A] border border-[#E7E9E1]">
                         {recipe.difficulty}
                       </span>
                     </div>
                   </div>
 
                   {/* Recipe Details */}
-                  <div className="p-5 space-y-3">
-                    <h3 className="text-xl font-bold text-[#242A25] group-hover:text-[#244C3A] transition-colors leading-snug">
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-extrabold text-[#242A25] group-hover:text-[#244C3A] transition-colors leading-snug">
                       {recipe.title}
                     </h3>
                     <p className="text-xs text-[#66756A] line-clamp-2 leading-relaxed">
@@ -311,14 +293,14 @@ export default function Dashboard() {
                 </div>
 
                 {/* Card Footer with Meta */}
-                <div className="px-5 pb-5 pt-2 border-t border-[#E7E9E1] flex items-center justify-between text-xs text-[#66756A]">
+                <div className="px-6 pb-5 pt-3 border-t border-[#E7E9E1] bg-[#FCFBF8] flex items-center justify-between text-xs text-[#66756A]">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-[#A8BDA5]" />
                     <span>{recipe.prepTimeMinutes + recipe.cookTimeMinutes} mins</span>
                   </div>
-                  <div className="flex items-center gap-1.5 font-semibold text-[#244C3A]">
+                  <div className="flex items-center gap-1.5 font-bold text-[#244C3A] group-hover:translate-x-0.5 transition-transform">
                     <span>View Recipe</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-4 h-4" />
                   </div>
                 </div>
               </div>
